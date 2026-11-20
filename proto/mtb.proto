@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+import "nanopb.proto";
+
+message FrequencyRecord {
+  uint32 frequency_MHz = 1;
+  uint32 sampling_MSPS = 2;
+
+  uint32 time_start_us = 3;
+  uint32 time_end_us = 4;
+  uint32 time_shift_ns = 5;
+
+
+  repeated uint32 voltage_adc = 6 [(nanopb).max_count = 540];
+  repeated uint32 current_adc = 7 [(nanopb).max_count = 540];
+}
+
+message MtbPayload {
+  enum MsgType {
+    DATA = 0;
+    STATUS = 1;
+    HEALTH = 2;
+  }
+
+  uint32 priority = 1;
+  uint32 node_id = 2;
+  uint32 seq = 3;
+  uint32 uptime_ms = 4;
+  MsgType type = 5;
+  uint32 target_node = 6;
+
+  uint32 test_id = 7;
+  repeated FrequencyRecord records = 8 [(nanopb).max_count = 15];
+}
+
