@@ -1,3 +1,4 @@
+#include <inttypes.h>
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
@@ -8,9 +9,9 @@
 
 #include <pb_decode.h>
 #include <pb_encode.h>
-#include "../inc/can_link.h"
-#include "../proto/mtb.pb.h"
-#include "../proto/link.pb.h"
+#include "can_link.h"
+#include "mtb.pb.h"
+#include "link.pb.h"
 
 #define SAMPLING_MSPS 3600000       /*3.6MSPS*/
 #define AMOUNT_FREQUENCIES 15
