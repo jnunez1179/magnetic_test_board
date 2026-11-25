@@ -13,7 +13,8 @@
 #include "mtb.pb.h"
 #include "link.pb.h"
 
-#define SAMPLING_MSPS 3600000       /*3.6MSPS*/
+/* Frequency Defines */
+#define SAMPLING_HZ      3600000       /*3.6MHZ (will be used in main.c during  ADC transfer)*/
 #define AMOUNT_FREQUENCIES 15
 #define MAX_SAMPLES        540
 
@@ -41,8 +42,8 @@ typedef struct  {
 /*TODO: Move FrequencyResults to main.c to be stored/accessed from FLASH*/
 /*Parameters used to formulate the different frequency results*/
 typedef struct FrequencyResults  {
-  uint32_t sampling_MSPS;
-  uint32_t frequency_MHz[AMOUNT_FREQUENCIES];
+  uint32_t sampling_hz;
+  uint32_t frequency_mhz[AMOUNT_FREQUENCIES];
 
   uint32_t time_start_us[AMOUNT_FREQUENCIES];
   uint32_t time_end_us[AMOUNT_FREQUENCIES];
@@ -65,11 +66,10 @@ static void build_mtb_data(MtbData *mtb_variant, MtbPayload_MsgType type, uint8_
 }
 
 /*Fill each corresponding frequency range with metadata and measured data*/
-static void build_frequency_records(MtbPayload *mtb_payload, const FrequencyResults *frequency_results)
-{
+static void build_frequency_records(MtbPayload *mtb_payload, const FrequencyResults *frequency_results) {
   for (uint8_t i = 0; i < AMOUNT_FREQUENCIES; i++) {
-    mtb_payload->records[i].frequency_MHz = frequency_results->frequency_MHz[i];
-    mtb_payload->records[i].sampling_MSPS = frequency_results->sampling_MSPS;
+    mtb_payload->records[i].frequency_mhz = frequency_results->frequency_mhz[i];
+    mtb_payload->records[i].sampling_hz = frequency_results->sampling_hz;
 
     mtb_payload->records[i].time_start_us = frequency_results->time_start_us[i];
     mtb_payload->records[i].time_end_us   = frequency_results->time_end_us[i];
