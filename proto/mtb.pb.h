@@ -11,15 +11,15 @@
 
 /* Enum definitions */
 typedef enum _MtbPayload_MsgType {
-    MtbPayload_MsgType_DATA = 0,
+    MtbPayload_MsgType_HEALTH = 0,
     MtbPayload_MsgType_STATUS = 1,
-    MtbPayload_MsgType_HEALTH = 2
+    MtbPayload_MsgType_DATA = 2
 } MtbPayload_MsgType;
 
 /* Struct definitions */
 typedef struct _FrequencyRecord {
-    uint32_t frequency_MHz;
-    uint32_t sampling_MSPS;
+    uint32_t frequency_mhz;
+    uint32_t sampling_hz;
     uint32_t time_start_us;
     uint32_t time_end_us;
     uint32_t time_shift_ns;
@@ -47,9 +47,9 @@ extern "C" {
 #endif
 
 /* Helper constants for enums */
-#define _MtbPayload_MsgType_MIN MtbPayload_MsgType_DATA
-#define _MtbPayload_MsgType_MAX MtbPayload_MsgType_HEALTH
-#define _MtbPayload_MsgType_ARRAYSIZE ((MtbPayload_MsgType)(MtbPayload_MsgType_HEALTH+1))
+#define _MtbPayload_MsgType_MIN MtbPayload_MsgType_HEALTH
+#define _MtbPayload_MsgType_MAX MtbPayload_MsgType_DATA
+#define _MtbPayload_MsgType_ARRAYSIZE ((MtbPayload_MsgType)(MtbPayload_MsgType_DATA+1))
 
 
 #define MtbPayload_type_ENUMTYPE MtbPayload_MsgType
@@ -62,8 +62,8 @@ extern "C" {
 #define MtbPayload_init_zero                     {0, 0, 0, 0, _MtbPayload_MsgType_MIN, 0, 0, 0, {FrequencyRecord_init_zero, FrequencyRecord_init_zero, FrequencyRecord_init_zero, FrequencyRecord_init_zero, FrequencyRecord_init_zero, FrequencyRecord_init_zero, FrequencyRecord_init_zero, FrequencyRecord_init_zero, FrequencyRecord_init_zero, FrequencyRecord_init_zero, FrequencyRecord_init_zero, FrequencyRecord_init_zero, FrequencyRecord_init_zero, FrequencyRecord_init_zero, FrequencyRecord_init_zero}}
 
 /* Field tags (for use in manual encoding/decoding) */
-#define FrequencyRecord_frequency_MHz_tag        1
-#define FrequencyRecord_sampling_MSPS_tag        2
+#define FrequencyRecord_frequency_mhz_tag        1
+#define FrequencyRecord_sampling_hz_tag          2
 #define FrequencyRecord_time_start_us_tag        3
 #define FrequencyRecord_time_end_us_tag          4
 #define FrequencyRecord_time_shift_ns_tag        5
@@ -80,8 +80,8 @@ extern "C" {
 
 /* Struct field encoding specification for nanopb */
 #define FrequencyRecord_FIELDLIST(X, a) \
-X(a, STATIC,   SINGULAR, UINT32,   frequency_MHz,     1) \
-X(a, STATIC,   SINGULAR, UINT32,   sampling_MSPS,     2) \
+X(a, STATIC,   SINGULAR, UINT32,   frequency_mhz,     1) \
+X(a, STATIC,   SINGULAR, UINT32,   sampling_hz,       2) \
 X(a, STATIC,   SINGULAR, UINT32,   time_start_us,     3) \
 X(a, STATIC,   SINGULAR, UINT32,   time_end_us,       4) \
 X(a, STATIC,   SINGULAR, UINT32,   time_shift_ns,     5) \

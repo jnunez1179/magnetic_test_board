@@ -3,8 +3,8 @@ syntax = "proto3";
 import "nanopb.proto";
 
 message FrequencyRecord {
-  uint32 frequency_MHz = 1;
-  uint32 sampling_MSPS = 2;
+  uint32 frequency_mhz = 1;
+  uint32 sampling_hz = 2;
 
   uint32 time_start_us = 3;
   uint32 time_end_us = 4;
@@ -17,9 +17,9 @@ message FrequencyRecord {
 
 message MtbPayload {
   enum MsgType {
-    DATA = 0;
+    HEALTH = 0;
     STATUS = 1;
-    HEALTH = 2;
+    DATA   = 2;
   }
 
   uint32 priority = 1;

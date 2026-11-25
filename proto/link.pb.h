@@ -12,13 +12,12 @@
 /* Enum definitions */
 typedef enum _LinkMessage_MsgType {
     LinkMessage_MsgType_HEARTBEAT = 0,
-    LinkMessage_MsgType_STATUS = 1
+    LinkMessage_MsgType_STATUS = 1,
+    LinkMessage_MsgType_START_TEST = 2
 } LinkMessage_MsgType;
 
 /* Struct definitions */
 typedef struct _LinkMessage {
-    /* CAN-style Priority (0 is highest, 7 is lowest)
- This mirrors the 3-bit priority field in J1939/CAN extended frames */
     uint32_t priority;
     uint32_t node_id;
     uint32_t seq;
@@ -34,8 +33,8 @@ extern "C" {
 
 /* Helper constants for enums */
 #define _LinkMessage_MsgType_MIN LinkMessage_MsgType_HEARTBEAT
-#define _LinkMessage_MsgType_MAX LinkMessage_MsgType_STATUS
-#define _LinkMessage_MsgType_ARRAYSIZE ((LinkMessage_MsgType)(LinkMessage_MsgType_STATUS+1))
+#define _LinkMessage_MsgType_MAX LinkMessage_MsgType_START_TEST
+#define _LinkMessage_MsgType_ARRAYSIZE ((LinkMessage_MsgType)(LinkMessage_MsgType_START_TEST+1))
 
 #define LinkMessage_type_ENUMTYPE LinkMessage_MsgType
 
