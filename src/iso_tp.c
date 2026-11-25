@@ -145,15 +145,12 @@ static void on_can_message(const uint8_t *buffer, size_t len, uint8_t source_nod
   }
 }
 
-    local_node = (uint8_t)can_link_node_id();
 
-    LOG_INF("Zephyr ISO-TP duplex test node %u online. TX Period: %dms offset=%dms",
-        (unsigned int)local_node, CONFIG_CAN_LINK_TX_PERIOD_MS,
-        CONFIG_CAN_LINK_TX_START_OFFSET_MS);
+/*Protobuf message transmit buffer*/
+uint8_t tx_buffer[MtbPayload_size];
 
-    if (CONFIG_CAN_LINK_TX_START_OFFSET_MS > 0) {
-        k_msleep(CONFIG_CAN_LINK_TX_START_OFFSET_MS);
-    }
+/*Structure containing Results from MTB Test on DUT (voltage/current & timestamps/frequency)*/
+FrequencyResults frequency_results;
 
 /*Configuration settings of each Protobuf payload*/
 MtbData mtb_data;
@@ -161,6 +158,8 @@ MtbData mtb_data;
 /*Generalized access point to mtb_data*/
 MtbData *action;
 
+/*Final Protobuf payload to be sent to OBC*/
+MtbPayload mtb_payload;
 
 
 
