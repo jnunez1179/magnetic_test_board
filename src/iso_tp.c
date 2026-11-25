@@ -15,12 +15,17 @@
 
 #define SAMPLING_MSPS 3600000       /*3.6MSPS*/
 #define AMOUNT_FREQUENCIES 15
-#define MAX_SAMPLES 540
+#define MAX_SAMPLES        540
 
-#define BROADCAST 1
-#define OBC 0
+/* Broadcast Defines*/
+#define OBC        0
+#define BROADCAST  1
 
-/* Payload Metadata Template structure */
+/*
+ * Payload Metadata Template structure
+ * Used to specify different message types: DATA/HEALTH/STATUS
+ * */
+
 typedef struct  {
   MtbPayload_MsgType type;
 
@@ -28,7 +33,7 @@ typedef struct  {
   uint8_t target_node;
   uint8_t priority;
 
-  uint8_t record_count;
+  uint8_t record_count;   /*Amount of Frequency Tests recorded: 15*/
 
   bool broadcast;
 } MtbData;
@@ -49,13 +54,12 @@ typedef struct FrequencyResults  {
   uint16_t current_count[AMOUNT_FREQUENCIES];
 } FrequencyResults;
 
-static void build_mtb_data(MtbData *mtb_variant, uint8_t type, uint8_t target_node,
-    uint8_t priority, uint16_t *test_id, bool broadcast)
+static void build_mtb_data(MtbData *mtb_variant, MtbPayload_MsgType type, uint8_t target_node,
+    uint8_t priority, bool broadcast)
 {
   mtb_variant->type = type;
   mtb_variant->target_node = target_node;
   mtb_variant->priority = priority;
-  mtb_variant->test_id = test_id;
   mtb_variant->broadcast = broadcast;
   mtb_variant->record_count = AMOUNT_FREQUENCIES;
 }
@@ -149,8 +153,11 @@ static void on_can_message(const uint8_t *buffer, size_t len, uint8_t source_nod
         k_msleep(CONFIG_CAN_LINK_TX_START_OFFSET_MS);
     }
 
-    build_mtb_data(mtb_data, MtbPayload_MsgType_DATA, CONFIG_CAN_LINK_PEER_NODE, 0U, &test_id, OBC)
+/*Configuration settings of each Protobuf payload*/
+MtbData mtb_data;
 
+/*Generalized access point to mtb_data*/
+MtbData *action;
 
 
 
@@ -167,9 +174,16 @@ static void on_can_message(const uint8_t *buffer, size_t len, uint8_t source_nod
 
 
 
+    build_mtb_data(&mtb_data, MtbPayload_MsgType_DATA, CONFIG_CAN_LINK_PEER_NODE_ADDR, 0U, OBC);
+    action = &mtb_data;
 
 
 
+    if (action->broadcast) {
+        ret = can_link_send_broadcast(tx_buffer, encoded_len);
+    } else {
+        ret = can_link_send_to(action->target_node, tx_buffer, encoded_len);
+    }
 
   return 0;
 }
