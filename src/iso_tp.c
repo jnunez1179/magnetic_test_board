@@ -34,7 +34,6 @@ K_SEM_DEFINE(mtb_sem, 0, 1);
 typedef struct  {
   MtbPayload_MsgType type;
 
-  uint16_t test_id;
   uint8_t target_node;
   uint8_t priority;
 
@@ -91,11 +90,10 @@ static void build_frequency_records(MtbPayload *mtb_payload, const FrequencyResu
 
 /*Encode Payload*/
 static bool encode_mtb_payload(MtbPayload *mtb_payload, MtbData *mtb_data, uint32_t seq,
-                        uint32_t *buffer, size_t *encoded_len)
+                        uint8_t *buffer, size_t *encoded_len)
 {
-  pb_ostream_t stream = pb_ostream_from_buffer(&buffer, MtbPayload_size);
+  pb_ostream_t stream = pb_ostream_from_buffer(buffer, MtbPayload_size);
   mtb_payload->node_id = can_link_node_id();
-  mtb_payload->test_id = mtb_data->test_id;
   mtb_payload->seq = seq;
 
   mtb_payload->type = mtb_data->type;
@@ -106,7 +104,7 @@ static bool encode_mtb_payload(MtbPayload *mtb_payload, MtbData *mtb_data, uint3
   mtb_payload->priority = mtb_data->priority;
   mtb_payload->uptime_ms = k_uptime_get_32();
 
-  if (!pb_encode(&stream, MtbPayload_fields, &mtb_payload)) {
+  if (!pb_encode(&stream, MtbPayload_fields, mtb_payload)) {
     LOG_ERR("Nanopb encode failed: %s", PB_GET_ERROR(&stream));
     return false;
   }
