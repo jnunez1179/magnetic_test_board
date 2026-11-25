@@ -13,6 +13,10 @@
 #include "mtb.pb.h"
 #include "link.pb.h"
 
+LOG_MODULE_REGISTER(main_app, LOG_LEVEL_INF);
+
+K_SEM_DEFINE(mtb_sem, 0, 1);
+
 /* Frequency Defines */
 #define SAMPLING_HZ      3600000       /*3.6MHZ (will be used in main.c during  ADC transfer)*/
 #define AMOUNT_FREQUENCIES 15
@@ -172,6 +176,8 @@ MtbData *action;
 
 
 
+  while (1) {
+    k_sem_take(&mtb_sem, K_FOREVER);
 
 
     build_mtb_data(&mtb_data, MtbPayload_MsgType_DATA, CONFIG_CAN_LINK_PEER_NODE_ADDR, 0U, OBC);
