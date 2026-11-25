@@ -161,6 +161,7 @@ MtbData *action;
 /*Final Protobuf payload to be sent to OBC*/
 MtbPayload mtb_payload;
 
+int main(void) {
 
 
   int ret = can_link_init(on_can_message, NULL);
@@ -169,18 +170,33 @@ MtbPayload mtb_payload;
     return 0;
   }
 
+  uint8_t local_node;
+  local_node = (uint8_t)can_link_node_id();
 
+  LOG_INF("MTB Node: %u online.", (unsigned int)local_node);
 
+  uint32_t seq = 1U;
+  size_t encoded_len;
 
 
   while (1) {
     k_sem_take(&mtb_sem, K_FOREVER);
 
+    frequency_results = (FrequencyResults){0};   /*Placeholder for Acquisition of Data from ADC*/
+    mtb_data = (MtbData){0};
+    mtb_payload = (MtbPayload)MtbPayload_init_zero;
 
     build_mtb_data(&mtb_data, MtbPayload_MsgType_DATA, CONFIG_CAN_LINK_PEER_NODE_ADDR, 0U, OBC);
     action = &mtb_data;
 
+    build_frequency_records(&mtb_payload, &frequency_results);
+    encoded_len = 0U;
+    LOG_INF("Transmitting..");
 
+    /*Encode MTB Payload*/
+    if (!encode_mtb_payload(&mtb_payload, &mtb_data, seq, tx_buffer, &encoded_len)) {
+        return -1;
+    }
 
     if (action->broadcast) {
         ret = can_link_send_broadcast(tx_buffer, encoded_len);
@@ -188,14 +204,14 @@ MtbPayload mtb_payload;
         ret = can_link_send_to(action->target_node, tx_buffer, encoded_len);
     }
 
+    if (ret != 0) {
+        LOG_ERR("TX start failed (seq %u): %d", (unsigned int)seq, ret);
+    } else {
+        LOG_INF("TX started: target=%u prio=%u len=%u seq=%u",
+            (unsigned int)action->target_node, (unsigned int)action->priority,
+            (unsigned int)encoded_len, (unsigned int)seq);
+    }
+    seq++;
+  }
   return 0;
 }
-
-
-
-
-
-
-
-
-
