@@ -123,34 +123,21 @@ static bool decode_message(const uint8_t *buffer, size_t len, LinkMessage *msg)
 static void on_can_message(const uint8_t *buffer, size_t len, uint8_t source_node,
                bool is_broadcast, void *user_data)
 {
-    LinkMessage msg;
-    ARG_UNUSED(user_data);
+  LinkMessage msg;
 
-    if (!decode_message(buffer, len, &msg)) {
-        return;
-    }
+  if (!decode_message(buffer, len, &msg)) {
+      return;
+  }
 
-    LOG_INF("RX [Prio:%u] src:%u->dst:%u type:%u seq:%" PRIu32 " (BC:%d)",
-        (unsigned int)msg.priority, source_node, (unsigned int)msg.target_node,
-        (unsigned int)msg.type, msg.seq, is_broadcast);
+  LOG_INF("RX [Prio:%u] src:%u->dst:%u type:%u seq:%" PRIu32 " (BC:%d)",
+      (unsigned int)msg.priority, source_node, (unsigned int)msg.target_node,
+      (unsigned int)msg.type, msg.seq, is_broadcast);
+
+  if (msg.type == LinkMessage_MsgType_START_TEST) {
+    k_sem_give(&mtb_sem);
+    return;
+  }
 }
-
-  int main(void) {
-    uint32_t tx_buffer[MtbPayload_size];
-
-    FrequencyResults frequency_results = {0};
-    MtbData mtb_data;
-
-    uint32_t seq = 1U;
-    uint32_t test_id = 1U;
-    size_t encoded_len;
-    uint8_t local_node;
-
-    int ret = can_link_init(on_can_message, NULL);
-    if (ret != 0) {
-      LOG_ERR("CAN init failed: %d", ret);
-      return 0;
-    }
 
     local_node = (uint8_t)can_link_node_id();
 
@@ -168,6 +155,11 @@ static void on_can_message(const uint8_t *buffer, size_t len, uint8_t source_nod
 
 
 
+  int ret = can_link_init(on_can_message, NULL);
+  if (ret != 0) {
+    LOG_ERR("CAN init failed: %d", ret);
+    return 0;
+  }
 
 
 
